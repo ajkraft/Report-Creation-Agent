@@ -1,0 +1,11 @@
+.sf/
+.sfdx/
+.localdevserver/
+node_modules/
+.DS_Store
+.env
+.env.*
+*.log
+coverage/
+.idea/
+.vscode/
