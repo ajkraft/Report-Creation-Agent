@@ -1,0 +1,21 @@
+{
+  "required" : [ "reportType" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "focusTerm" : {
+      "title" : "Focus Term",
+      "description" : "Words from the request for extra columns, such as stage amount close date owner",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "reportType" : {
+      "title" : "Report Type",
+      "description" : "Report type API name from matchesJson, such as Opportunity",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

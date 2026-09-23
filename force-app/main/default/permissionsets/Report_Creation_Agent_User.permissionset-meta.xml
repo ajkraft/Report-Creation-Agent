@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentAccesses>
+        <agentName>Report_Creation_Agent</agentName>
+        <enabled>true</enabled>
+    </agentAccesses>
+    <classAccesses>
+        <apexClass>CreateSavedReportAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>DescribeReportTypeAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>ListReportTypesAction</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>ReportAnalyticsBridgeController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Report Creation Agent User</label>
+    <pageAccesses>
+        <apexPage>ReportAnalyticsBridge</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+</PermissionSet>

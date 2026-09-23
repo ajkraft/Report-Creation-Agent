@@ -1,0 +1,253 @@
+system:
+    instructions: |
+        You are an AI assistant that creates saved Salesforce reports for coworkers.
+        You are an AI assistant, not a human.
+        Never invent report types or column names. Use only values returned by your actions.
+        Save the report when the request is specific enough. Ask one question only when the
+        report type or a column cannot be matched.
+    messages:
+        welcome: "Tell me the report you want. I'll save it and send you a link to open it."
+        error: "I couldn't save that report. Tell me which records you want and I'll try again."
+
+config:
+    developer_name: "Report_Creation_Agent"
+    agent_label: "Report Creation Agent"
+    description: "Creates a saved Salesforce report from a plain-language request and returns a link."
+    agent_type: "AgentforceEmployeeAgent"
+
+variables:
+    selected_report_type: mutable string = ""
+        description: "Report type API name chosen for this request"
+    schema_loaded: mutable boolean = False
+        description: "True after the report type columns have been loaded"
+    report_saved: mutable boolean = False
+        description: "True after a report has been saved in this conversation"
+    report_url: mutable string = ""
+        description: "Link to the saved report"
+    last_error: mutable string = ""
+        description: "Plain-language error from the last action"
+
+language:
+    default_locale: "en_US"
+    additional_locales: ""
+    all_additional_locales: False
+
+start_agent agent_router:
+    label: "Agent Router"
+    description: "Route the coworker to report creation or a guardrail."
+
+    reasoning:
+        instructions: ->
+            | You are a router only. Do not create a report yourself. Route immediately.
+              - A request to create, build, or save a report that names the records -> use to_report_builder
+              - A request for a report that does not say which records -> use to_ambiguous
+              - Anything else -> use to_off_topic
+        actions:
+            to_report_builder: @utils.transition to @subagent.report_builder
+                description: "Create a saved report from a request that names the records"
+            to_ambiguous: @utils.transition to @subagent.ambiguous_question
+                description: "The user wants a report but the subject is unclear"
+            to_off_topic: @utils.transition to @subagent.off_topic
+                description: "The request is not about creating a report"
+
+subagent report_builder:
+    label: "Report Builder"
+    description: "Turn a plain-language report request into one saved report and a link."
+
+    actions:
+        list_report_types:
+            description: "Find report types that match the subject of the request."
+            target: "apex://ListReportTypesAction"
+            include_in_progress_indicator: True
+            progress_indicator_message: "Looking up report types..."
+            inputs:
+                searchTerm: string
+                    description: "Words from the request that name the records, such as opportunities or accounts"
+                    is_required: True
+            outputs:
+                matchesJson: string
+                    description: "JSON array of matching report types with label, type, category, and isDataCloud"
+                    is_displayable: False
+                isSuccess: boolean
+                    description: "Whether at least one report type matched"
+                    filter_from_agent: True
+                errorMessage: string
+                    description: "Plain-language error. Empty on success."
+                    is_displayable: True
+
+        describe_report_type:
+            description: "Load real columns, standard filters, and the default date column for one report type."
+            target: "apex://DescribeReportTypeAction"
+            include_in_progress_indicator: True
+            progress_indicator_message: "Loading report columns..."
+            inputs:
+                reportType: string
+                    description: "Report type API name from matchesJson, such as Opportunity"
+                    is_required: True
+                focusTerm: string
+                    description: "Words from the request for extra columns, such as stage amount close date owner"
+                    is_required: False
+            outputs:
+                columnsJson: string
+                    description: "JSON with columns, standardFilters, and defaultDateColumn"
+                    is_displayable: False
+                truncated: boolean
+                    description: "True when some columns were left out"
+                    filter_from_agent: True
+                isSuccess: boolean
+                    description: "Whether the report type was described"
+                    filter_from_agent: True
+                reportType: string
+                    description: "Report type that was described"
+                    filter_from_agent: True
+                errorMessage: string
+                    description: "Plain-language error. Empty on success."
+                    is_displayable: True
+
+        create_saved_report:
+            description: "Save the report in the user's private reports and return a link."
+            target: "apex://CreateSavedReportAction"
+            include_in_progress_indicator: True
+            progress_indicator_message: "Saving the report..."
+            inputs:
+                reportName: string
+                    description: "Short report name derived from the request"
+                    is_required: True
+                reportType: string
+                    description: "Report type API name"
+                    is_required: True
+                reportFormat: string
+                    description: "TABULAR or SUMMARY"
+                    is_required: True
+                detailColumnsJson: string
+                    description: "JSON array of column apiName values. Do not include grouping columns."
+                    is_required: True
+                groupingsDownJson: string
+                    description: "JSON array of column apiName values to group by. Required for SUMMARY."
+                    is_required: False
+                filtersJson: string
+                    description: "JSON array of objects with column, operator, and value"
+                    is_required: False
+                scope: string
+                    description: "Report scope. Use organization unless the user asks for only their own records."
+                    is_required: False
+                standardDateColumn: string
+                    description: "defaultDateColumn from columnsJson when the user names a date range"
+                    is_required: False
+                standardDateDuration: string
+                    description: "Duration such as THIS_FISCAL_QUARTER, THIS_QUARTER, THIS_MONTH, or THIS_FISCAL_YEAR"
+                    is_required: False
+                standardFiltersJson: string
+                    description: "JSON array of name and value from standardFilters, such as open and open"
+                    is_required: False
+            outputs:
+                isSuccess: boolean
+                    description: "Whether the report was saved"
+                    filter_from_agent: True
+                reportId: string
+                    description: "Salesforce Id of the saved report"
+                    filter_from_agent: True
+                reportName: string
+                    description: "Name the report was saved with"
+                    is_displayable: True
+                reportUrl: string
+                    description: "Link that opens the saved report"
+                    is_displayable: True
+                errorMessage: string
+                    description: "Plain-language error. Empty on success."
+                    is_displayable: True
+
+    reasoning:
+        instructions: ->
+            if @variables.report_saved == True:
+                | The report is saved. Give the user the report name and this link: {!@variables.report_url}
+                | Do not create another report unless they explicitly ask for a different one.
+                | If they ask for a different report, use reset_for_new_report, then start over with list_report_types.
+
+            if @variables.schema_loaded == False:
+                | Create one saved Salesforce report.
+                | Call list_report_types with a short search term for the records the user named.
+                | Prefer a match where isDataCloud is false and the label is the plain object, such as Opportunities with type Opportunity.
+                | If several non-data-cloud types could fit, ask which one. Do not save yet.
+                | When one type fits, call describe_report_type with that type and a focusTerm of the fields the user mentioned.
+
+            if @variables.schema_loaded == True and @variables.report_saved == False:
+                | Columns, standard filters, and the default date column are in the describe result.
+                | Use only apiName values from that result. Never invent a column name.
+                | If a field the user asked for is missing and truncated is true, call describe_report_type again with that field as focusTerm.
+                | Use SUMMARY when the user asks to group, break down, or summarize by a field. Otherwise use TABULAR.
+                | Do not put a grouping column in detailColumnsJson.
+                | For "open" records, if standardFilters contains name "open", pass standardFiltersJson [{"name":"open","value":"open"}].
+                | For a date range such as this quarter or this month, set standardDateColumn to defaultDateColumn and standardDateDuration to THIS_FISCAL_QUARTER, THIS_QUARTER, THIS_MONTH, or THIS_FISCAL_YEAR.
+                | Other filters use filtersJson with column, operator, and value. Operators are equals, notEqual, contains, lessThan, greaterThan.
+                | Then call create_saved_report. After it succeeds, reply with the report name and the link. Stop.
+                | If an action returns an error, explain it in plain language and ask what to change.
+
+        actions:
+            find_types: @actions.list_report_types
+                description: "Search report types for the subject of the request"
+                with searchTerm = ...
+                set @variables.last_error = @outputs.errorMessage
+                available when @variables.schema_loaded == False and @variables.report_saved == False
+
+            describe_type: @actions.describe_report_type
+                description: "Load real columns for the chosen report type"
+                with reportType = ...
+                with focusTerm = ...
+                set @variables.selected_report_type = @outputs.reportType
+                set @variables.schema_loaded = @outputs.isSuccess
+                set @variables.last_error = @outputs.errorMessage
+                available when @variables.report_saved == False
+
+            save_report: @actions.create_saved_report
+                description: "Save the report and return a link"
+                with reportName = ...
+                with reportType = @variables.selected_report_type
+                with reportFormat = ...
+                with detailColumnsJson = ...
+                with groupingsDownJson = ...
+                with filtersJson = ...
+                with scope = "organization"
+                with standardDateColumn = ...
+                with standardDateDuration = ...
+                with standardFiltersJson = ...
+                set @variables.report_saved = @outputs.isSuccess
+                set @variables.report_url = @outputs.reportUrl
+                set @variables.last_error = @outputs.errorMessage
+                available when @variables.schema_loaded == True and @variables.report_saved == False
+
+            reset_for_new_report: @utils.setVariables
+                description: "The user asked for a different report. Clear the previous one."
+                with report_saved = False
+                with schema_loaded = False
+                with report_url = ""
+                with selected_report_type = ""
+                available when @variables.report_saved == True
+
+            back_to_router: @utils.transition to @subagent.agent_router
+                description: "Return to the router"
+
+subagent off_topic:
+    label: "Off Topic"
+    description: "Redirect the conversation back to creating a report."
+
+    reasoning:
+        instructions: ->
+            | The request is outside what I do. I create saved Salesforce reports and send back a link.
+              Ask what records the report should cover. Do not answer general-knowledge questions.
+        actions:
+            to_report_builder: @utils.transition to @subagent.report_builder
+                description: "The user has now asked for a report"
+
+subagent ambiguous_question:
+    label: "Ambiguous Question"
+    description: "Ask which records the report should cover."
+
+    reasoning:
+        instructions: ->
+            | The request does not say which records to report on.
+              Ask one question: which records should the report cover, such as opportunities, accounts, or cases?
+              Do not guess and do not save a report.
+        actions:
+            to_report_builder: @utils.transition to @subagent.report_builder
+                description: "The user has clarified which records the report is about"

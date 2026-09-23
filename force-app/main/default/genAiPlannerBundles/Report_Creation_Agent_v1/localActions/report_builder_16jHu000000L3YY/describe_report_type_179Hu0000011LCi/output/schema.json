@@ -1,0 +1,46 @@
+{
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "columnsJson" : {
+      "title" : "Columns Json",
+      "description" : "JSON with columns, standardFilters, and defaultDateColumn",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "errorMessage" : {
+      "title" : "Error Message",
+      "description" : "Plain-language error. Empty on success.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : true,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "isSuccess" : {
+      "title" : "Is Success",
+      "description" : "Whether the report type was described",
+      "lightning:type" : "lightning__booleanType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : false
+    },
+    "reportType" : {
+      "title" : "Report Type",
+      "description" : "Report type that was described",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : false
+    },
+    "truncated" : {
+      "title" : "Truncated",
+      "description" : "True when some columns were left out",
+      "lightning:type" : "lightning__booleanType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

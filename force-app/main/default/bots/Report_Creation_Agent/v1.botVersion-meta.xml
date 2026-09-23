@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BotVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>v1</fullName>
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <botDialogs>
+        <botSteps>
+            <botMessages>
+                <message>Tell me the report you want. I&apos;ll save it and send you a link to open it.</message>
+                <messageIdentifier>a3345426-85b6-4a4b-bf1f-5de292a61630</messageIdentifier>
+            </botMessages>
+            <stepIdentifier>6c28c16d-f7c9-47ed-b239-d0e9f5018663</stepIdentifier>
+            <type>Message</type>
+        </botSteps>
+        <botSteps>
+            <stepIdentifier>8d33d865-a58d-4a36-a412-2e2145b85b72</stepIdentifier>
+            <type>Wait</type>
+        </botSteps>
+        <developerName>Welcome</developerName>
+        <isPlaceholderDialog>false</isPlaceholderDialog>
+        <label>Welcome</label>
+        <showInFooterMenu>false</showInFooterMenu>
+    </botDialogs>
+    <botDialogs>
+        <botSteps>
+            <botMessages>
+                <message>I couldn&apos;t save that report. Tell me which records you want and I&apos;ll try again.</message>
+                <messageIdentifier>11e310c8-f0ad-443d-9b12-70340d513997</messageIdentifier>
+            </botMessages>
+            <stepIdentifier>35a038cd-57b2-4fe1-83bd-9bdc00979f5b</stepIdentifier>
+            <type>Message</type>
+        </botSteps>
+        <botSteps>
+            <stepIdentifier>cf1e88aa-d6b6-47c9-88f8-57dcdb40bf3f</stepIdentifier>
+            <type>Wait</type>
+        </botSteps>
+        <developerName>Rich_Content_Error_Handling</developerName>
+        <isPlaceholderDialog>false</isPlaceholderDialog>
+        <label>Error Handler</label>
+        <showInFooterMenu>false</showInFooterMenu>
+    </botDialogs>
+    <botDialogs>
+        <developerName>Transfer_To_Agent</developerName>
+        <isPlaceholderDialog>false</isPlaceholderDialog>
+        <label>Transfer To Agent</label>
+        <showInFooterMenu>false</showInFooterMenu>
+    </botDialogs>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationDefinitionPlanners>
+        <genAiPlannerName>Report_Creation_Agent_v1</genAiPlannerName>
+    </conversationDefinitionPlanners>
+    <conversationSystemDialogs>
+        <dialog>Rich_Content_Error_Handling</dialog>
+        <type>ErrorHandling</type>
+    </conversationSystemDialogs>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>Runtime condition evaluation for if statements</description>
+        <developerName>AgentScriptInternal_condition_1</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Runtime Condition 1</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Plain-language error from the last action</description>
+        <developerName>last_error</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Last Error</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after a report has been saved in this conversation</description>
+        <developerName>report_saved</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Report Saved</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Link to the saved report</description>
+        <developerName>report_url</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Report Url</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the report type columns have been loaded</description>
+        <developerName>schema_loaded</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Schema Loaded</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>Report type API name chosen for this request</description>
+        <developerName>selected_report_type</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Selected Report Type</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <defaultStdObjForContactIdFltrEnabled>false</defaultStdObjForContactIdFltrEnabled>
+    <entryDialog>Welcome</entryDialog>
+    <intentDisambiguationEnabled>false</intentDisambiguationEnabled>
+    <intentV3Enabled>false</intentV3Enabled>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <stopRecPrompts>false</stopRecPrompts>
+    <stopWelcomePrompts>false</stopWelcomePrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+</BotVersion>

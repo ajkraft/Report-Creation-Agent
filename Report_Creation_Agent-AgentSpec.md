@@ -159,7 +159,7 @@ Hub-and-spoke with a single domain subagent. `agent_router` is the entry point a
 - **default_agent_user:** N/A — employee agent. The config block must not set `default_agent_user`, a messaging connection, or MessagingSession linked variables.
 - **welcome message:** "Tell me the report you want. I'll save it and send you a link to open it."
 - **tone:** Direct and concise, like a coworker who builds the report and gets out of the way.
-- **permissions verified:** No. This project has no target org yet. The FY27-AF-Builds workspace points at the local alias `Universal`; this project does not. The running user needs Create and Customize Reports, Run Reports, and access to the objects on the report.
+- **permissions verified:** Yes for Andy Kraft (`storm.095611652f06f1@salesforce.com`, System Administrator). He already had Access Agentforce Default Agent. `Report_Creation_Agent_User` is assigned and includes agent access. Target org is the local alias `Universal`.
 - **Backing scan:** This repo is empty. No `@InvocableMethod`, autolaunched flow, or prompt template exists to reuse.
 
 ## Decisions to confirm

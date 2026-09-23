@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Creates a saved Salesforce report from a plain-language request and returns a link.</description>
+    <localTopicLinks>
+        <genAiPluginName>agent_router_16jHu000000L3YY</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>ambiguous_question_16jHu000000L3YY</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>off_topic_16jHu000000L3YY</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>report_builder_16jHu000000L3YY</genAiPluginName>
+    </localTopicLinks>
+    <localTopics>
+        <fullName>off_topic_16jHu000000L3YY</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Redirect the conversation back to creating a report.</description>
+        <developerName>off_topic_16jHu000000L3YY</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI assistant that creates saved Salesforce reports for coworkers.
+You are an AI assistant, not a human.
+Never invent report types or column names. Use only values returned by your actions.
+Save the report when the request is specific enough. Ask one question only when the
+report type or a column cannot be matched.</description>
+            <developerName>instruction0_179Hu0000011LCk</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179Hu0000011LCk</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>off_topic</localDeveloperName>
+        <masterLabel>Off Topic</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>report_builder_16jHu000000L3YY</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Turn a plain-language report request into one saved report and a link.</description>
+        <developerName>report_builder_16jHu000000L3YY</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI assistant that creates saved Salesforce reports for coworkers.
+You are an AI assistant, not a human.
+Never invent report types or column names. Use only values returned by your actions.
+Save the report when the request is specific enough. Ask one question only when the
+report type or a column cannot be matched.</description>
+            <developerName>instruction0_179Hu0000011LCi</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179Hu0000011LCi</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localActionLinks>
+            <functionName>create_saved_report_179Hu0000011LCi</functionName>
+        </localActionLinks>
+        <localActionLinks>
+            <functionName>list_report_types_179Hu0000011LCi</functionName>
+        </localActionLinks>
+        <localActionLinks>
+            <functionName>describe_report_type_179Hu0000011LCi</functionName>
+        </localActionLinks>
+        <localActions>
+            <fullName>list_report_types_179Hu0000011LCi</fullName>
+            <description>Find report types that match the subject of the request.</description>
+            <developerName>list_report_types_179Hu0000011LCi</developerName>
+            <invocationTarget>ListReportTypesAction</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+            <localDeveloperName>list_report_types</localDeveloperName>
+            <masterLabel>List Report Types</masterLabel>
+            <progressIndicatorMessage>Looking up report types...</progressIndicatorMessage>
+        </localActions>
+        <localActions>
+            <fullName>describe_report_type_179Hu0000011LCi</fullName>
+            <description>Load real columns, standard filters, and the default date column for one report type.</description>
+            <developerName>describe_report_type_179Hu0000011LCi</developerName>
+            <invocationTarget>DescribeReportTypeAction</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+            <localDeveloperName>describe_report_type</localDeveloperName>
+            <masterLabel>Describe Report Type</masterLabel>
+            <progressIndicatorMessage>Loading report columns...</progressIndicatorMessage>
+        </localActions>
+        <localActions>
+            <fullName>create_saved_report_179Hu0000011LCi</fullName>
+            <description>Save the report in the user&apos;s private reports and return a link.</description>
+            <developerName>create_saved_report_179Hu0000011LCi</developerName>
+            <invocationTarget>CreateSavedReportAction</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+            <localDeveloperName>create_saved_report</localDeveloperName>
+            <masterLabel>Create Saved Report</masterLabel>
+            <progressIndicatorMessage>Saving the report...</progressIndicatorMessage>
+        </localActions>
+        <localDeveloperName>report_builder</localDeveloperName>
+        <masterLabel>Report Builder</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>ambiguous_question_16jHu000000L3YY</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Ask which records the report should cover.</description>
+        <developerName>ambiguous_question_16jHu000000L3YY</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI assistant that creates saved Salesforce reports for coworkers.
+You are an AI assistant, not a human.
+Never invent report types or column names. Use only values returned by your actions.
+Save the report when the request is specific enough. Ask one question only when the
+report type or a column cannot be matched.</description>
+            <developerName>instruction0_179Hu0000011LCj</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179Hu0000011LCj</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>ambiguous_question</localDeveloperName>
+        <masterLabel>Ambiguous Question</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <localTopics>
+        <fullName>agent_router_16jHu000000L3YY</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Route the coworker to report creation or a guardrail.</description>
+        <developerName>agent_router_16jHu000000L3YY</developerName>
+        <genAiPluginInstructions>
+            <description>You are an AI assistant that creates saved Salesforce reports for coworkers.
+You are an AI assistant, not a human.
+Never invent report types or column names. Use only values returned by your actions.
+Save the report when the request is specific enough. Ask one question only when the
+report type or a column cannot be matched.</description>
+            <developerName>instruction0_179Hu0000011LCh</developerName>
+            <language>en_US</language>
+            <masterLabel>instruction0_179Hu0000011LCh</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>agent_router</localDeveloperName>
+        <masterLabel>Agent Router</masterLabel>
+        <pluginType>Topic</pluginType>
+    </localTopics>
+    <masterLabel>Report Creation Agent</masterLabel>
+    <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+</GenAiPlannerBundle>

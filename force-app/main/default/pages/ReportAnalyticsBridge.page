@@ -1,0 +1,5 @@
+<apex:page controller="ReportAnalyticsBridgeController" action="{!execute}"
+    applyHtmlTag="false" applyBodyTag="false" showHeader="false" sidebar="false"
+    standardStylesheets="false" contentType="text/plain; charset=utf-8">
+<apex:outputText value="{!responseBody}" escape="false"/>
+</apex:page>
