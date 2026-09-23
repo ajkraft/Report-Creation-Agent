@@ -3,8 +3,10 @@ system:
         You are an AI assistant that creates saved Salesforce reports for coworkers.
         You are an AI assistant, not a human.
         Never invent report types or column names. Use only values returned by your actions.
-        Save the report when the request is specific enough. Ask one question only when the
-        report type or a column cannot be matched.
+        Before saving, restate every filter in plain language and wait for the user to confirm.
+        Never apply a date range unless the user asked for one and confirmed it.
+        When you share the saved report, send the HTML link from the action exactly as written.
+        Never paste the raw URL, and never rewrite the link as the name followed by the address.
     messages:
         welcome: "Tell me the report you want. I'll save it and send you a link to open it."
         error: "I couldn't save that report. Tell me which records you want and I'll try again."
@@ -22,8 +24,12 @@ variables:
         description: "True after the report type columns have been loaded"
     report_saved: mutable boolean = False
         description: "True after a report has been saved in this conversation"
+    filters_confirmed: mutable boolean = False
+        description: "True only after the user confirms the filters that will be saved"
     report_url: mutable string = ""
         description: "Link to the saved report"
+    report_link: mutable string = ""
+        description: "Markdown link to the saved report"
     last_error: mutable string = ""
         description: "Plain-language error from the last action"
 
@@ -149,10 +155,16 @@ subagent report_builder:
                     filter_from_agent: True
                 reportName: string
                     description: "Name the report was saved with"
-                    is_displayable: True
+                    filter_from_agent: False
+                    is_displayable: False
                 reportUrl: string
-                    description: "Link that opens the saved report"
-                    is_displayable: True
+                    description: "Address of the saved report. Do not show this as plain text."
+                    filter_from_agent: False
+                    is_displayable: False
+                reportLink: string
+                    description: "HTML link the agent should send exactly as written."
+                    filter_from_agent: False
+                    is_displayable: False
                 errorMessage: string
                     description: "Plain-language error. Empty on success."
                     is_displayable: True
@@ -160,7 +172,9 @@ subagent report_builder:
     reasoning:
         instructions: ->
             if @variables.report_saved == True:
-                | The report is saved. Give the user the report name and this link: {!@variables.report_url}
+                | The report is saved. Reply with the HTML link below exactly as written, then one short sentence.
+                  The link text must be the report name. Do not rewrite it as a raw URL or as name followed by the address.
+                  {!@variables.report_link}
                 | Do not create another report unless they explicitly ask for a different one.
                 | If they ask for a different report, use reset_for_new_report, then start over with list_report_types.
 
@@ -171,17 +185,27 @@ subagent report_builder:
                 | If several non-data-cloud types could fit, ask which one. Do not save yet.
                 | When one type fits, call describe_report_type with that type and a focusTerm of the fields the user mentioned.
 
-            if @variables.schema_loaded == True and @variables.report_saved == False:
-                | Columns, standard filters, and the default date column are in the describe result.
-                | Use only apiName values from that result. Never invent a column name.
-                | If a field the user asked for is missing and truncated is true, call describe_report_type again with that field as focusTerm.
-                | Use SUMMARY when the user asks to group, break down, or summarize by a field. Otherwise use TABULAR.
+            if @variables.schema_loaded == True and @variables.filters_confirmed == False:
+                | If you have not already listed the filters in this conversation, tell the user exactly what you will save, then stop.
+                | Include the report name, the records, the columns, any grouping, and every filter.
+                | List each filter in plain language, including amount, status, and date range.
+                | If the user did not ask for a date range, say "No date range." Do not invent one.
+                | Ask: "Save it with these filters?"
+                | Do not call confirm_filters until the user answers that question.
+                | If your previous message already asked, and the user's latest message agrees, call confirm_filters now. Do not ask again.
+                | If they change a filter, restate the full list and ask again. Do not call confirm_filters.
+
+            if @variables.schema_loaded == True and @variables.filters_confirmed == True and @variables.report_saved == False:
+                | The user confirmed the filters. Call create_saved_report now.
+                | Use only apiName values from the describe result. Never invent a column name.
+                | Use SUMMARY when the user asked to group or break down by a field. Otherwise use TABULAR.
                 | Do not put a grouping column in detailColumnsJson.
-                | For "open" records, if standardFilters contains name "open", pass standardFiltersJson [{"name":"open","value":"open"}].
-                | For a date range such as this quarter or this month, set standardDateColumn to defaultDateColumn and standardDateDuration to THIS_FISCAL_QUARTER, THIS_QUARTER, THIS_MONTH, or THIS_FISCAL_YEAR.
-                | Other filters use filtersJson with column, operator, and value. Operators are equals, notEqual, contains, lessThan, greaterThan.
-                | Then call create_saved_report. After it succeeds, reply with the report name and the link. Stop.
-                | If an action returns an error, explain it in plain language and ask what to change.
+                | Pass standardDateDuration only when the user asked for a date range and confirmed it.
+                  Use THIS_FISCAL_QUARTER, THIS_QUARTER, THIS_MONTH, THIS_FISCAL_YEAR, or TODAY.
+                  Otherwise pass NONE so no from-date is applied.
+                | Pass standardFiltersJson only for a status filter the user confirmed, such as [{"name":"open","value":"open"}].
+                | Other confirmed filters use filtersJson with column, operator, and value.
+                | After it succeeds, reply with the HTML in reportLink exactly as written. Never paste the raw URL.
 
         actions:
             find_types: @actions.list_report_types
@@ -213,14 +237,22 @@ subagent report_builder:
                 with standardFiltersJson = ...
                 set @variables.report_saved = @outputs.isSuccess
                 set @variables.report_url = @outputs.reportUrl
+                set @variables.report_link = @outputs.reportLink
                 set @variables.last_error = @outputs.errorMessage
-                available when @variables.schema_loaded == True and @variables.report_saved == False
+                available when @variables.schema_loaded == True and @variables.filters_confirmed == True and @variables.report_saved == False
+
+            confirm_filters: @utils.setVariables
+                description: "The user explicitly agreed to the filters you just listed. Call this only after their reply, never in the turn where you ask."
+                with filters_confirmed = True
+                available when @variables.schema_loaded == True and @variables.filters_confirmed == False and @variables.report_saved == False
 
             reset_for_new_report: @utils.setVariables
                 description: "The user asked for a different report. Clear the previous one."
                 with report_saved = False
                 with schema_loaded = False
+                with filters_confirmed = False
                 with report_url = ""
+                with report_link = ""
                 with selected_report_type = ""
                 available when @variables.report_saved == True
 

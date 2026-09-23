@@ -1,0 +1,77 @@
+{
+  "required" : [ "reportName", "reportType", "reportFormat", "detailColumnsJson" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "detailColumnsJson" : {
+      "title" : "Detail Columns Json",
+      "description" : "JSON array of column apiName values. Do not include grouping columns.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "filtersJson" : {
+      "title" : "Filters Json",
+      "description" : "JSON array of objects with column, operator, and value",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "groupingsDownJson" : {
+      "title" : "Groupings Down Json",
+      "description" : "JSON array of column apiName values to group by. Required for SUMMARY.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "reportFormat" : {
+      "title" : "Report Format",
+      "description" : "TABULAR or SUMMARY",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "reportName" : {
+      "title" : "Report Name",
+      "description" : "Short report name derived from the request",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "reportType" : {
+      "title" : "Report Type",
+      "description" : "Report type API name",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "scope" : {
+      "title" : "Scope",
+      "description" : "Report scope. Use organization unless the user asks for only their own records.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "standardDateColumn" : {
+      "title" : "Standard Date Column",
+      "description" : "defaultDateColumn from columnsJson when the user names a date range",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "standardDateDuration" : {
+      "title" : "Standard Date Duration",
+      "description" : "Duration such as THIS_FISCAL_QUARTER, THIS_QUARTER, THIS_MONTH, or THIS_FISCAL_YEAR",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "standardFiltersJson" : {
+      "title" : "Standard Filters Json",
+      "description" : "JSON array of name and value from standardFilters, such as open and open",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

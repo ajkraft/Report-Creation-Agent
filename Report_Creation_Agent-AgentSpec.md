@@ -165,5 +165,6 @@ Hub-and-spoke with a single domain subagent. `agent_router` is the entry point a
 ## Decisions to confirm
 
 1. Save into the requester's private reports, rather than a shared folder.
-2. Save immediately when the request is specific. Ask one question only when the report type or a column cannot be resolved.
-3. v1 is tabular and summary reports on any report type the user can already access. No object blocklist, no dashboards, no edits to existing reports.
+2. Before saving, list every filter, including date range, and wait for a yes. Do not keep a report type's default from-date unless the user asked for a date range.
+3. The saved-report reply is a clickable report name, not a raw web address.
+4. v1 is tabular and summary reports on any report type the user can already access. No object blocklist, no dashboards, no edits to existing reports.

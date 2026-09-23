@@ -61,10 +61,6 @@ public with sharing class CreateSavedReportAction {
                 return result;
             }
 
-            String dateColumn = req.standardDateColumn;
-            if (String.isBlank(dateColumn)) {
-                dateColumn = ReportAnalyticsClient.defaultDateColumn(described);
-            }
             Map<String, Object> metadata = new Map<String, Object>{
                 'name' => req.reportName.left(40),
                 'reportFormat' => format,
@@ -82,10 +78,25 @@ public with sharing class CreateSavedReportAction {
                 metadata.put('showGrandTotal', true);
                 metadata.put('showSubtotals', true);
             }
-            if (String.isNotBlank(req.standardDateDuration) && String.isNotBlank(dateColumn)) {
+            String dateColumn = String.isBlank(req.standardDateColumn)
+                ? ReportAnalyticsClient.defaultDateColumn(described)
+                : req.standardDateColumn;
+            String duration = req.standardDateDuration == null ? '' : req.standardDateDuration.trim();
+            Boolean userAskedForDates = String.isNotBlank(duration)
+                && duration.toUpperCase() != 'NONE'
+                && duration.toUpperCase() != 'CUSTOM';
+            if (userAskedForDates && String.isNotBlank(dateColumn)) {
                 metadata.put('standardDateFilter', new Map<String, Object>{
                     'column' => dateColumn,
-                    'durationValue' => req.standardDateDuration
+                    'durationValue' => duration
+                });
+            } else if (String.isNotBlank(dateColumn)) {
+                // Report types ship with a custom "from" date. Clear it unless the user asked for a range.
+                metadata.put('standardDateFilter', new Map<String, Object>{
+                    'column' => dateColumn,
+                    'durationValue' => 'CUSTOM',
+                    'startDate' => null,
+                    'endDate' => null
                 });
             }
             if (!standardFilters.isEmpty()) {
@@ -116,6 +127,7 @@ public with sharing class CreateSavedReportAction {
                 ? (String) saved.get('name')
                 : (String) metadata.get('name');
             result.reportUrl = ReportAnalyticsClient.lightningReportUrl(reportId);
+            result.reportLink = '<a href="' + result.reportUrl + '">' + result.reportName + '</a>';
             result.isSuccess = true;
             result.errorMessage = '';
         } catch (Exception e) {
@@ -266,6 +278,9 @@ public with sharing class CreateSavedReportAction {
 
         @InvocableVariable(label='Report URL' description='Link that opens the saved report')
         public String reportUrl;
+
+        @InvocableVariable(label='Report Link' description='HTML link the agent should send instead of a raw URL')
+        public String reportLink;
 
         @InvocableVariable(label='Error Message' description='Plain-language error. Empty on success.')
         public String errorMessage;
